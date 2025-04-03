@@ -66,7 +66,7 @@ else:
         st.write(alerts[['Timestamp', 'Distance', 'SmokeDetected', 'AlertStatus']])
 
         # Gas Value Trend
-        st.subheader("Gas Value Trend Over Time")
+        st.subheader("Trend Over Time")
         fig, ax = plt.subplots()
         ax.plot(data['Timestamp'], data['Distance'], label='Distance')
         ax.set_xlabel("Timestamp")
