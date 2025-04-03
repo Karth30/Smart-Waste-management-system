@@ -78,3 +78,7 @@ else:
 
     else:
         st.warning("No data available. Make sure the Google Sheet is accessible.")
+    # Force manual refresh
+    if st.button("Refresh Data"):
+        st.rerun()
+
