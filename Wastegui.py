@@ -3,17 +3,15 @@ import pandas as pd
 import requests
 import matplotlib.pyplot as plt
 
-
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1bYjM5O-qsO4kNUgJvQh6wz-q_fQyW1vYysjDPECVwpc/gviz/tq?tqx=out:csv"
 
-
-USERS = {"admin": "waste"} 
+USERS = {"admin": "waste"}
 
 # Function to fetch data
 def fetch_data():
     try:
         df = pd.read_csv(SHEET_URL)
-        df.columns = ['Timestamp', 'Distance', 'SmokeDetected', 'AlertStatus']
+        df.columns = ['Timestamp', 'Distance', 'GasValue', 'SmokeDetected', 'AlertStatus']
         df['Timestamp'] = pd.to_datetime(df['Timestamp'])
         return df
     except Exception as e:
@@ -57,28 +55,36 @@ else:
     if not data.empty:
         latest_data = data.iloc[-1]
         st.metric("Current Distance (cm)", f"{latest_data['Distance']:.2f}")
-        st.metric("Gas Detection", latest_data['SmokeDetected'])
+        st.metric("Gas Sensor Value", latest_data['GasValue'])
+        st.metric("Smoke Detection", latest_data['SmokeDetected'])
         st.metric("Alert Status", latest_data['AlertStatus'])
 
         # Filter Alerts
         alerts = data[data['AlertStatus'] != 'No Alert']
         st.subheader("Alerts")
-        st.write(alerts[['Timestamp', 'Distance', 'SmokeDetected', 'AlertStatus']])
+        st.write(alerts[['Timestamp', 'Distance', 'GasValue', 'SmokeDetected', 'AlertStatus']])
 
-        # Gas Value Trend
-        st.subheader("Trend Over Time")
+        # Distance Trend Over Time
+        st.subheader("Distance Trend Over Time")
         fig, ax = plt.subplots()
-        ax.plot(data['Timestamp'], data['Distance'], label='Distance')
+        ax.plot(data['Timestamp'], data['Distance'], label='Distance', color='blue')
         ax.set_xlabel("Timestamp")
         ax.set_ylabel("Distance (cm)")
         ax.legend()
         st.pyplot(fig)
 
-       
+        # Gas Sensor Trend Over Time
+        st.subheader("Gas Sensor Trend Over Time")
+        fig, ax = plt.subplots()
+        ax.plot(data['Timestamp'], data['GasValue'], label='Gas Value', color='red')
+        ax.set_xlabel("Timestamp")
+        ax.set_ylabel("Gas Sensor Value")
+        ax.legend()
+        st.pyplot(fig)
 
     else:
         st.warning("No data available. Make sure the Google Sheet is accessible.")
+    
     # Force manual refresh
     if st.button("Refresh Data"):
         st.rerun()
-
